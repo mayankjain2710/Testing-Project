@@ -1,5 +1,6 @@
 import speech_recognition as sr
 import streamlit as st
+import pyaudio
 import os
 import textwrap
 import google.generativeai as genai
