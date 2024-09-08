@@ -23,19 +23,24 @@ r = sr.Recognizer()
 # Function to record speech and convert to text
 def record_text():
     try:
+        # Ensure the microphone is available and initialized
         with sr.Microphone() as source2:
             r.adjust_for_ambient_noise(source2, duration=0.2)
             st.write("Listening...")
             audio2 = r.listen(source2)
             st.write("Processing...")
+            # Using Google Speech Recognition
             MyText = r.recognize_google(audio2)
             return MyText
 
     except sr.RequestError as e:
-        st.write("Could not request results; {0}".format(e))
+        st.write(f"Could not request results; {e}")
 
     except sr.UnknownValueError:
         st.write("Unknown error occurred")
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 # Function to get Gemini response
 def get_gemini_response(question):
