@@ -1,79 +1,50 @@
-import speech_recognition as sr
+# Q&A Chatbot
+#from langchain.llms import OpenAI
+
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+
 import streamlit as st
 import os
+import pathlib
 import textwrap
+
 import google.generativeai as genai
-from dotenv import load_dotenv
+
+from IPython.display import display
 from IPython.display import Markdown
 
-# Load environment variables from .env
-load_dotenv()
 
-# Configure Gemini API key
-try:
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-except Exception as e:
-    st.error(f"Error configuring Gemini API: {e}")
-
-# Function to convert bullet points to Markdown
 def to_markdown(text):
-    text = text.replace('•', '  *')
-    return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
+  text = text.replace('•', '  *')
+  return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 
-# Initialize recognizer for speech recognition
-r = sr.Recognizer()
+os.getenv("GOOGLE_API_KEY")
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-# Function to record speech and convert to text
-def record_text():
-    try:
-        with sr.Microphone() as source2:
-            r.adjust_for_ambient_noise(source2, duration=0.2)
-            st.write("Listening...")
-            audio2 = r.listen(source2)
-            st.write("Processing...")
-            MyText = r.recognize_google(audio2)
-            return MyText
-    except sr.RequestError as e:
-        st.error(f"Could not request results; {e}")
-    except sr.UnknownValueError:
-        st.warning("Unknown error occurred")
+## Function to load OpenAI model and get respones
 
-# Function to get Gemini response
 def get_gemini_response(question):
-    try:
-        model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(question)
-        return response.text
-    except Exception as e:
-        st.error(f"Error getting Gemini response: {e}")
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(question)
+    return response.text
 
-# Initialize Streamlit app
+##initialize our streamlit app
+
 st.set_page_config(page_title="Shiksha Saarthi")
-st.header("SHIKSHA SAARTHI")
 
-# Check if session state exists for storing input
-if 'input_text' not in st.session_state:
-    st.session_state['input_text'] = ''
+st.header("Shiksha Saarthi")
 
-# Button to record speech
-if st.button("Speak to Agent"):
-    speech_input = record_text()
-    if speech_input:
-        st.session_state['input_text'] = speech_input 
-# Save speech to session state
+input=st.text_input("Input: ",key="input")
 
-# Input text box as fallback, filled with speech input if available
-input_text = st.text_input("Input:", value=st.session_state['input_text'])
 
-# Button to submit query
-submit = st.button("Proceed")
+submit=st.button("Proceed")
 
-# If submit button is clicked
+## If ask button is clicked
+
 if submit:
-    if not input_text:
-        st.warning("No input provided.")
-    else:
-        # Get response from Gemini Pro
-        response = get_gemini_response(input_text)
-        st.subheader("The Response is")
-        st.write(response)
+    
+    response=get_gemini_response(input)
+    st.subheader("The Response is")
+    st.write(response)
