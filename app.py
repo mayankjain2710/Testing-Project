@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import streamlit as st
-import pyaudio
+from pydub import AudioSegment
+from pydub.playback import play
 import os
 import textwrap
 import google.generativeai as genai
